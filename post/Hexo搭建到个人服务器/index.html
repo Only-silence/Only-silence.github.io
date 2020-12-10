@@ -1,0 +1,420 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hexo搭建到个人服务器 | 只余宁静</title>
+<link rel="shortcut icon" href="https://only-silence.github.io/favicon.ico?v=1607593606554">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://only-silence.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Hexo搭建到个人服务器 | 只余宁静 - Atom Feed" href="https://only-silence.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="前言
+​		说实话，这玩意整了两天我才整好，网上大多数都是将Hexo搭建到GitHub上，找了很长时间才找到几个搭建在个人服务器上的，但是都不是很详细，所以我汇总了一下，得出以下经验。
+
+环境：
+
+阿里云轻量级服务器
+宝塔面板
+nginx
+..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://only-silence.github.io">
+  <img class="avatar" src="https://only-silence.github.io/images/avatar.png?v=1607593606554" alt="">
+  </a>
+  <h1 class="site-title">
+    只余宁静
+  </h1>
+  <p class="site-description">
+    学无止境"
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://only-silence.github.io" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Hexo搭建到个人服务器
+            </h2>
+            <div class="post-info">
+              <span>
+                2019-12-21
+              </span>
+              <span>
+                5 min read
+              </span>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://only-silence.github.io/post-images/Hexo搭建到个人服务器.jpg" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h4 id="前言">前言</h4>
+<p>​		说实话，这玩意整了两天我才整好，网上大多数都是将<code>Hexo</code>搭建到<code>GitHub</code>上，找了很长时间才找到几个搭建在个人服务器上的，但是都不是很详细，所以我汇总了一下，得出以下经验。</p>
+<!-- more -->
+<h4 id="环境">环境：</h4>
+<ul>
+<li>阿里云轻量级服务器</li>
+<li>宝塔面板</li>
+<li>nginx</li>
+<li>nod + npm + git</li>
+</ul>
+<h4 id="1-安装所需环境">1. 安装所需环境</h4>
+<figure data-type="image" tabindex="1"><img src="https://only-silence.github.io/post-images/1607593355473.png" alt="" loading="lazy"></figure>
+<h4 id="2-添加站点并非设置默认路径">2. 添加站点并非设置默认路径</h4>
+<figure data-type="image" tabindex="2"><img src="https://only-silence.github.io/post-images/1607593364118.png" alt="" loading="lazy"></figure>
+<h4 id="3-创建git仓库">3. 创建git仓库</h4>
+<p>ssh远程连接服务器，在服务器默认路径下创建<code>git</code>仓库    <code>hexo.git</code>  (我的默认路径 <code>/www/wwwroot/</code>)</p>
+<pre><code>mkdir hexo.git
+
+cd hexo.git
+
+git init --bare
+</code></pre>
+<p>然后回到 <code>/www/wwwroot/</code> 默认路径下，创建一个文件夹 <code>hexo</code>并赋予权限，这就是以后网站存放目录</p>
+<pre><code>mkdir hexo
+
+chmod 0755 hexo
+
+chown root:root -R /www/wwwroot/hexo
+</code></pre>
+<p>再创建一个  tmp  目录，后面要用到</p>
+<pre><code>mkdir tmp
+</code></pre>
+<h4 id="4-git配置">4. git配置</h4>
+<pre><code>vim hexo.git/hooks/post-receive
+</code></pre>
+<p>向里面写入（ i 键激活写入）：</p>
+<pre><code>#!/bin/bash -l
+
+GIT_REPO=/www/wwwroot/hexo.git                      # 触发 hook
+
+TMP_GIT_CLONE=/www/wwwroot/tmp                # 存在 /tmp 下
+
+PUBLIC_WWW=/www/wwwroot/hexo                 # 展示网站的目录
+
+rm -rf ${TMP_GIT_CLONE}                  # 删除之前内容
+
+git clone $GIT_REPO $TMP_GIT_CLONE       # 将 Git 仓库上传的内容复制到/tmp
+
+rm -rf ${PUBLIC_WWW}                   # 删除展示网站的目录的全部内容
+
+cp -rf ${TMP_GIT_CLONE} ${PUBLIC_WWW}  # 将/tmp所有内容复制到网站目录
+</code></pre>
+<p>写入完成后保存退出即可（ : 键激活输入命令,然后输入 wq 保存并退出 ）</p>
+<p>更改脚本权限</p>
+<pre><code>chmod +x post-receive
+</code></pre>
+<h4 id="5-nginx配置">5. nginx配置</h4>
+<pre><code>cd /etc/nginx/sites-available
+
+vim default
+</code></pre>
+<p>删除内容并写入：</p>
+<pre><code>server {
+    listen 80;
+    listen [::]:80;
+    root /www/wwwroot/hexo;
+    index index.html index.htm index.nginx-debian.html;
+    server_name 你的域名;#没有域名可不用填写
+    location ~* ^.+\.(ico|gif|jpg|jpeg|png)$ {
+        root /www/wwwroot/hexo;
+        access_log   off;
+        expires      1d;
+    }
+    location ~* ^.+\.(css|js|txt|xml|swf|wav)$ {
+        root /www/wwwroot/hexo;
+        access_log   off;
+        expires      10m;
+    }
+    location / {
+        root /www/wwwroot/hexo;
+        if (-f $request_filename) {
+            rewrite ^/(.*)$  /$1 break;
+        }
+    }
+}
+</code></pre>
+<p>然后保存并退出，使用命令重启<code>nginx</code></p>
+<pre><code>service nginx restart
+</code></pre>
+<h4 id="6-本地环境搭建">6. 本地环境搭建</h4>
+<p>环境：</p>
+<ul>
+<li>win10</li>
+<li>node + npm + git</li>
+</ul>
+<h5 id="安装hexo">安装<code>Hexo</code>:</h5>
+<p><code>npm install -g hexo-cli</code></p>
+<p>安装完后新建文件夹（例 <code>E：hexo</code>），然后执行以下命令</p>
+<pre><code>hexo init &lt;folder&gt;
+
+cd &lt;folder&gt;
+
+npm install
+</code></pre>
+<p>本地<code>hexo</code>搭建完成，运行<code>hexo s</code>命令即可访问本地项目 http://localhost:4000</p>
+<h5 id="本地git环境搭建">本地<code>git</code>环境搭建</h5>
+<ol>
+<li>
+<p>安装<code>git</code></p>
+</li>
+<li>
+<p>生成<code>ssh</code>认证，执行如下命令</p>
+<pre><code>git config --global user.name &quot;yourname&quot;
+
+git config --global user.email “youremail”
+
+ssh-keygen -t rsa -C &quot;youremail&quot;
+
+git config --global core.autocrlf false  // 禁用自动转换
+</code></pre>
+<p>最后获取到的<code>ssh</code>认证在<code>C:\Users\yourname\.ssh</code>中</p>
+</li>
+<li>
+<p>在本地建立<code>ssh</code>信任关系：</p>
+<pre><code>ssh-copy-id -i C:/Users/yourname/.ssh/id_rsa.pub root@server_ip
+
+ssh root@server_ip // 测试能否登录
+</code></pre>
+<p>打开本地<code>hexo</code>文件夹，在<code>_config.yml</code>中更改：</p>
+<pre><code>deploy:
+
+type: git                      *# 设置上传模块为 Git*
+
+repo: root@sever_ip:/www/wwwroot/hexo.git  *# 连接到服务器*
+
+branch: master                 *# 存储在 master 分支（主分支）*
+</code></pre>
+<p>保存即可</p>
+</li>
+</ol>
+<h4 id="7-基本命令">7. 基本命令</h4>
+<p><code>cd hexo</code>进入本地环境文件夹</p>
+<p>执行<code>hexo new '文章标题'</code>创建新文章</p>
+<ul>
+<li>
+<p><code>title</code>是标题，<code>date</code>是编写时间，<code>tags</code>是标签，<code>categories</code>是分类且一篇文章只有一个分类</p>
+</li>
+<li>
+<p>例如本文格式：</p>
+<pre><code class="language-1232224">title: Hexo搭建到个人服务器
+date: 2019-12-21 03:08:37
+tags:
+- Linux
+- Hexo
+- 服务器
+categories:
+- Linux
+</code></pre>
+</li>
+</ul>
+<p>第一次运行执行<code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</code>即可将写好的博客上传至服务器</p>
+<p>以后可直接<code>hexo g &amp;&amp; hexo d</code></p>
+<h5 id="hexo常用命令">Hexo常用命令</h5>
+<pre><code>hexo g  # 是hexo generate的简写形式，生成静态文件到public文件夹
+</code></pre>
+<pre><code>hexo d  # 是hexo deploy的简写形式，部署静态文件到设定的仓库
+</code></pre>
+<pre><code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo d  # 常用的组合命令，清除缓存，生成静态文件，并部署到指定仓库
+</code></pre>
+<h5 id="在文章中引入本地文章">在文章中引入本地文章</h5>
+<pre><code>{% post_link ??????? %}  # ?为文章名(不带后缀)
+</code></pre>
+<h4 id="注意事项">注意事项：</h4>
+<ul>
+<li>
+<p>hexo目录下可以新建其它文件夹，但是不可再执行<code>hexo clear</code>命令，否则会报404错误，解决方法是删除新建的文件夹后执行<code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</code>即可。</p>
+</li>
+<li>
+<p>无权限rm</p>
+</li>
+</ul>
+<figure data-type="image" tabindex="3"><img src="https://only-silence.github.io/post-images/1607593386221.png" alt="" loading="lazy"></figure>
+<p>解决方法是在 <code>/www/wwwroot/</code>下运行：</p>
+<pre><code>chmod 777 .
+</code></pre>
+<p>注：要用<code>root</code>权限</p>
+<h4 id="8-参考链接">8. 参考链接</h4>
+<ul>
+<li>https://hexo.io/zh-cn/docs/</li>
+<li>https://www.cnblogs.com/luoshuitianyi/p/10333928.html</li>
+<li>https://blog.csdn.net/qq_35561857/article/details/81590953</li>
+<li>https://www.jianshu.com/p/196773379a78</li>
+<li>https://www.jianshu.com/p/7d8f6cfa6b43</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E5%89%8D%E8%A8%80">前言</a></li>
+<li><a href="#%E7%8E%AF%E5%A2%83">环境：</a></li>
+<li><a href="#1-%E5%AE%89%E8%A3%85%E6%89%80%E9%9C%80%E7%8E%AF%E5%A2%83">1. 安装所需环境</a></li>
+<li><a href="#2-%E6%B7%BB%E5%8A%A0%E7%AB%99%E7%82%B9%E5%B9%B6%E9%9D%9E%E8%AE%BE%E7%BD%AE%E9%BB%98%E8%AE%A4%E8%B7%AF%E5%BE%84">2. 添加站点并非设置默认路径</a></li>
+<li><a href="#3-%E5%88%9B%E5%BB%BAgit%E4%BB%93%E5%BA%93">3. 创建git仓库</a></li>
+<li><a href="#4-git%E9%85%8D%E7%BD%AE">4. git配置</a></li>
+<li><a href="#5-nginx%E9%85%8D%E7%BD%AE">5. nginx配置</a></li>
+<li><a href="#6-%E6%9C%AC%E5%9C%B0%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA">6. 本地环境搭建</a>
+<ul>
+<li><a href="#%E5%AE%89%E8%A3%85hexo">安装<code>Hexo</code>:</a></li>
+<li><a href="#%E6%9C%AC%E5%9C%B0git%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA">本地<code>git</code>环境搭建</a></li>
+</ul>
+</li>
+<li><a href="#7-%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4">7. 基本命令</a>
+<ul>
+<li><a href="#hexo%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4">Hexo常用命令</a></li>
+<li><a href="#%E5%9C%A8%E6%96%87%E7%AB%A0%E4%B8%AD%E5%BC%95%E5%85%A5%E6%9C%AC%E5%9C%B0%E6%96%87%E7%AB%A0">在文章中引入本地文章</a></li>
+</ul>
+</li>
+<li><a href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9">注意事项：</a></li>
+<li><a href="#8-%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5">8. 参考链接</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '61ea8234f634ee0c2b9f',
+    clientSecret: 'ecbc531fba8a6cd2b11cfc714540fc7e7ca03246',
+    repo: 'only-silence.github.io',
+    owner: 'Only-silence',
+    admin: ['Only-silence'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  
+  <a class="rss" href="https://only-silence.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
