@@ -2,23 +2,19 @@
   <head>
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>关于 | 只余宁静</title>
+<title>css写支付成功效果 | 只余宁静</title>
 <link rel="shortcut icon" href="https://only-silence.github.io/favicon.ico?v=1610013947801">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://only-silence.github.io/styles/main.css">
-<link rel="alternate" type="application/atom+xml" title="关于 | 只余宁静 - Atom Feed" href="https://only-silence.github.io/atom.xml">
+<link rel="alternate" type="application/atom+xml" title="css写支付成功效果 | 只余宁静 - Atom Feed" href="https://only-silence.github.io/atom.xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
-    <meta name="description" content="
-欢迎来到我的小站呀，很高兴遇见你！🤝
-
-🏠 关于本站
-👨‍💻 博主是谁
-⛹ 兴趣爱好
-📬 联系我呀
-..." />
+    <meta name="description" content="HTML结构
+&lt;view class=&quot;success&quot;&gt;
+	&lt;view class=&quot;success_left&quot;&gt;&lt;/view&gt;
+	&lt;view class=..." />
     <meta name="keywords" content="" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
     <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
@@ -81,27 +77,84 @@
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              关于
+              css写支付成功效果
             </h2>
             <div class="post-info">
               <span>
-                2019-01-25
+                2021-01-07
               </span>
               <span>
-                1 min read
+                2 min read
               </span>
               
             </div>
             
+              <img class="post-feature-image" src="https://only-silence.github.io/post-images/css-xie-zhi-fu-cheng-gong-xiao-guo.png" alt="">
+            
             <div class="post-content-wrapper">
               <div class="post-content">
-                <blockquote>
-<p>欢迎来到我的小站呀，很高兴遇见你！🤝</p>
-</blockquote>
-<h4 id="关于本站">🏠 关于本站</h4>
-<h4 id="博主是谁">👨‍💻 博主是谁</h4>
-<h4 id="兴趣爱好">⛹ 兴趣爱好</h4>
-<h4 id="联系我呀">📬 联系我呀</h4>
+                <h4 id="html结构">HTML结构</h4>
+<pre><code class="language-html">&lt;view class=&quot;success&quot;&gt;
+	&lt;view class=&quot;success_left&quot;&gt;&lt;/view&gt;
+	&lt;view class=&quot;success_right&quot;&gt;&lt;/view&gt;
+&lt;/view&gt;
+</code></pre>
+<br />
+<h4 id="css样式">CSS样式</h4>
+<pre><code class="language-css">.success {
+  height: 100rpx;
+  width: 100rpx;
+  border-radius: 50%;
+  position: relative;
+  background-color: green;
+}
+
+.success view {
+  content: '';
+  position: absolute;
+  width: 8px;
+  transform-origin: left top;  /* 控制元素的旋转基点位置（不设置此属性会导致位置漂移） */
+  transition: ease 0.5;  /* 过度效果 快启动，慢停止 */
+  border-radius: 10px;
+  background-color: #fff;
+}
+
+.success_left {
+  top: 55%;
+  left: 12%;
+  transform: rotate(-50deg);  /* 旋转 */
+  /* 贝塞尔曲线，设置动画效果 0s表示立即执行 forwards表示执行结束保持状态 */
+  animation: reverseTop 0.3s cubic-bezier(0.35, 0, 0.25, 1) 0s forwards;
+}
+
+.success_right {
+  top: 80%;
+  left: 43%;
+  transform: rotate(-135deg);  /* 旋转 */
+  /* 贝塞尔曲线，设置动画效果 0.3s表示0.3秒后执行（无缝衔接） forwards表示执行结束保持状态 */
+  animation: reverseBottom 0.2s cubic-bezier(0.35, 0, 0, 1) 0.3s forwards;
+}
+</code></pre>
+<br />
+<h4 id="css动画">CSS动画</h4>
+<pre><code class="language-css">@keyframes reverseTop {
+  0% {
+      height: 0;
+  }
+  100% {
+      height: 40rpx;
+  }
+}
+
+@keyframes reverseBottom {
+  0% {
+      height: 0;
+  }
+  100% {
+      height: 65rpx;
+  }
+}
+</code></pre>
 
               </div>
               <div class="toc-container">
@@ -112,10 +165,9 @@
 <ul>
 <li>
 <ul>
-<li><a href="#%E5%85%B3%E4%BA%8E%E6%9C%AC%E7%AB%99">🏠 关于本站</a></li>
-<li><a href="#%E5%8D%9A%E4%B8%BB%E6%98%AF%E8%B0%81">👨‍💻 博主是谁</a></li>
-<li><a href="#%E5%85%B4%E8%B6%A3%E7%88%B1%E5%A5%BD">⛹ 兴趣爱好</a></li>
-<li><a href="#%E8%81%94%E7%B3%BB%E6%88%91%E5%91%80">📬 联系我呀</a></li>
+<li><a href="#html%E7%BB%93%E6%9E%84">HTML结构</a></li>
+<li><a href="#css%E6%A0%B7%E5%BC%8F">CSS样式</a></li>
+<li><a href="#css%E5%8A%A8%E7%94%BB">CSS动画</a></li>
 </ul>
 </li>
 </ul>
@@ -129,6 +181,15 @@
           </article>
         </div>
 
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://only-silence.github.io/post/收银小键盘的输入控制/">
+              <h3 class="post-title">
+                 收银小键盘的输入控制
+              </h3>
+            </a>
+          </div>
         
 
         
