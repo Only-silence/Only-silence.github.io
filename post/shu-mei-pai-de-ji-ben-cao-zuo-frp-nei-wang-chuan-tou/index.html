@@ -1,0 +1,379 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>树莓派的基本操作 + Frp内网穿透 | 只余宁静</title>
+<link rel="shortcut icon" href="https://only-silence.github.io/favicon.ico?v=1610513642876">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://only-silence.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="树莓派的基本操作 + Frp内网穿透 | 只余宁静 - Atom Feed" href="https://only-silence.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="简介
+​		树莓派是一款基于ARM的微型电脑主板，以SD/MicroSD卡为内存硬盘，卡片主板周围有1/2/4个USB接口和一个10/100/1000以太网接口（A型没有网口），可连接键盘、鼠标和网线，同时拥有视频模拟信号的电视输出接口和H..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://only-silence.github.io">
+  <img class="avatar" src="https://only-silence.github.io/images/avatar.png?v=1610513642876" alt="">
+  </a>
+  <h1 class="site-title">
+    只余宁静
+  </h1>
+  <p class="site-description">
+    学无止境"
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://only-silence.github.io" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              树莓派的基本操作 + Frp内网穿透
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-01-13
+              </span>
+              <span>
+                7 min read
+              </span>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://only-silence.github.io/post-images/shu-mei-pai-de-ji-ben-cao-zuo-frp-nei-wang-chuan-tou.jpg" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h4 id="简介">简介</h4>
+<p>​		树莓派是一款基于<a href="https://baike.baidu.com/item/ARM">ARM</a>的微型电脑主板，以SD/MicroSD卡为内存硬盘，卡片主板周围有1/2/4个USB接口和一个10/100/1000以太网接口（A型没有网口），可连接键盘、鼠标和网线，同时拥有视频模拟信号的电视输出接口和HDMI高清视频输出接口，以上部件全部整合在一张仅比信用卡稍大的主板上，具备所有PC的基本功能只需接通电视机和键盘，就能执行如电子表格、文字处理、玩游戏、播放高清视频等诸多功能。</p>
+<p>​		本文将会涉及树莓派系统镜像的烧录，国内源更改，Frp内网穿透配置，Frp的开机自启。</p>
+<p>​		要实现Frp内网穿透还需一台有公网IP的服务器<!--more--></p>
+<h4 id="准备">准备</h4>
+<ul>
+<li>
+<p>树莓派 (本文所用树莓派4b 8g+64g)</p>
+</li>
+<li>
+<p>读卡器</p>
+</li>
+<li>
+<p><a href="https://www.raspberrypi.org/software/">Raspberry Pi Imager</a></p>
+</li>
+<li>
+<p><a href="https://www.raspberrypi.org/forums/viewtopic.php?f=117&amp;t=275370">镜像 (本文所用64位)</a></p>
+</li>
+<li>
+<p><a href="https://github.com/fatedier/frp/releases">Frp (本文所用版本frp_0.34.3_linux_arm64.tar.gz)</a></p>
+</li>
+<li>
+<p>服务器 (本文所用阿里云服务器)</p>
+</li>
+</ul>
+<h4 id="开始">开始</h4>
+<h5 id="一-镜像烧录">一、镜像烧录</h5>
+<p>​		将新的SD卡（格式化后的）插入读卡器，接入电脑，打开<code>Raspberry Pi Imager</code>软件</p>
+<figure data-type="image" tabindex="1"><img src="https://only-silence.github.io/post-images/1610513561427.jpg" alt="" loading="lazy"></figure>
+<p>​		点击<code>CHOOSE OS</code>菜单，在最下方选择<code>Use custom</code>，导入下载好的镜像</p>
+<p>​		ps: 若是没有格式化SD卡可选择<code>Erase</code>选项格式化</p>
+<figure data-type="image" tabindex="2"><img src="https://only-silence.github.io/post-images/1610513571015.jpg" alt="" loading="lazy"></figure>
+<p>​		回到主菜单，点击<code>CHOOSE OS CARD</code>，选择接入的SD卡，点击<code>WRITE</code>开始烧录镜像</p>
+<h5 id="二-配置国内源">二、配置国内源</h5>
+<p>​		将烧录好的SD卡插入树莓派，通电即可进入系统，接下来首先配置国内更新源</p>
+<p>​		64位镜像可以直接使用debian的系统源，首先编辑<code>sudo nano /etc/apt/sources.list</code>，使用<code>#</code>号注释原内容，然后在末尾添加Debian的系统源：</p>
+<pre><code># 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ buster main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-updates main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-updates main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-backports main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-backports main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian-security buster/updates main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian-security buster/updates main contrib non-free
+</code></pre>
+<p>​		接着需要配置树莓派官方的软件源，编辑<code>sudo nano /etc/apt/sources.list.d/raspi.list</code>，同样的，注释原内容，在末尾添加如下内容：</p>
+<pre><code>deb http://mirrors.tuna.tsinghua.edu.cn/raspberrypi/ buster main ui
+</code></pre>
+<p>​		系统源和软件源配置完成以后，使用下述两条命令更新：</p>
+<pre><code>sudo apt update
+sudo apt upgrade -y
+</code></pre>
+<h5 id="三-配置frp">三、配置Frp</h5>
+<h6 id="1-配置服务端">1. 配置服务端</h6>
+<p>​		将下载好的frp压缩包上传到服务器，根目录新建文件夹<code>frp</code>，将压缩包内的<code>frps</code>和<code>frps.ini</code>解压缩到<code>frp</code>文件夹，并编辑<code>frps.ini</code>文件</p>
+<pre><code>[common]
+bind_port = 7000
+#默认配置中监听的是7000端口，可修改，但是服务器需要开放对应端口，否则无法访问
+</code></pre>
+<h6 id="2-配置客户端树莓派">2. 配置客户端（树莓派）</h6>
+<p>​		进入<code>home/pi</code>文件夹，新建文件夹<code>frp</code></p>
+<pre><code>$mkdir frp
+</code></pre>
+<p>​		将下载好的frp压缩包中的<code>frpc</code>和<code>frpc.ini</code>解压缩到frp文件夹，并编辑<code>frpc.ini</code>文件</p>
+<pre><code>[common]
+server_addr = 127.0.0.1  #frp服务器地址
+server_port = 7000  #frp服务器端口
+
+[ssh]
+type = tcp
+local_ip = 127.0.0.1  #本地地址
+local_port = 22  #本地端口
+remote_port = 6000  #远程端口
+</code></pre>
+<h6 id="3-启动frp">3. 启动Frp</h6>
+<pre><code>pi@raspberrypi:~/frp $ ./frpc -c ./frpc.ini
+2019/08/08 23:51:22 [I] [service.go:223] login to server success, get run id [68ecfd2834058088], server udp port [0]
+2019/08/08 23:51:22 [I] [proxy_manager.go:137] [68ecfd2834058088] proxy added: [ssh]
+2019/08/08 23:51:22 [I] [control.go:144] [ssh] start proxy success
+</code></pre>
+<p>​		这样frp就配置结束了，使用<code>$ ssh -p 6000 pi@IP地址</code>就可以访问了</p>
+<h5 id="四-设置frp开机自启">四、设置Frp开机自启</h5>
+<p>​		这里介绍两种方法，我们将在服务端和客户端分别使用。</p>
+<h6 id="1systemctl">1.Systemctl</h6>
+<p>​		第一种方法我们使用systemctl来控制启动，我们在服务端进行配置。</p>
+<p>​		首先我们需要在<code>/lib/systemd/system/</code>下新建一个名为<code>frps.service</code>的文件。</p>
+<pre><code>$sudo nano /lib/systemd/system/frps.service
+</code></pre>
+<p>​		写入以下</p>
+<pre><code>[Unit]
+Description=Frp Server Service
+After=network.target syslog.target
+Wants=network.target network-online.target
+[Service]
+Type=simple
+#启动服务的命令（此处写你的frps的实际安装目录）
+ExecStart=/frp/frps -c /frp/frps.ini
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+<p>​		然后启动frps服务并设置开机自启动：</p>
+<pre><code>$sudo systemctl start frps
+$sudo systemctl enable frps
+</code></pre>
+<p>​		其他systemctl命令：</p>
+<ul>
+<li>
+<p>重启 <code>sudo systemctl restart frps</code></p>
+</li>
+<li>
+<p>停止 <code>sudo systemctl stop frps</code></p>
+</li>
+<li>
+<p>查看应用日志 <code>sudo systemctl status frps</code></p>
+</li>
+</ul>
+<h6 id="2supervisor">2.Supervisor</h6>
+<p>首先我们需要安装Supervisor：</p>
+<pre><code>sudo apt install supervisor
+</code></pre>
+<p>​		然后我们在<code>/etc/supervisor/conf.d</code>下创建配置文件 <code>frpc.conf</code>:</p>
+<pre><code>$sudo nano /etc/supervisor/conf.d/frpc.conf
+</code></pre>
+<p>​		下面是我的配置：</p>
+<pre><code>[program:frpc]
+command= /home/pi/frp/frpc -c /home/pi/frp/frpc.ini ; 程序启动命令
+autostart=true      ; 在supervisord启动的时候也自动启动
+startsecs=5         ; 启动5秒后没有异常退出，就表示进程正常启动了，默认为1秒
+autorestart=true    ; 程序退出后自动重启,可选值:[unexpected,true,false],默认为unexpected,表示进程意外杀死后才重启
+startretries=5       ; 启动失败自动重试次数，默认是3
+user=root            ; 用哪个用户启动进程，默认是root
+priority=999         ; 进程启动优先级，默认999，值小的优先启动
+stopasgroup=false     ;默认为false,进程被杀死时，是否向这个进程组发送stop信号，包括子进程
+killasgroup=false     ;默认为false，向进程组发送kill信号，包括子进程
+</code></pre>
+<p>​		编辑完成后，要重新加载一下Supervisor，下面是一些相关命令：</p>
+<pre><code># 重启supervisor
+sudo systemctl restart supervisor
+# 查看supervisor运行状态
+sudo supervisorctl status
+#停止frpc
+supervisorctl stop frpc
+#启动frpc
+supervisorctl start frpc
+#重启frpc
+supervisorctl restart frpc
+</code></pre>
+<p>​		至此，Frp的配置就结束了，可以重启系统连接ssh试验一下是否有效</p>
+<pre><code>$sudo reboot
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E7%AE%80%E4%BB%8B">简介</a></li>
+<li><a href="#%E5%87%86%E5%A4%87">准备</a></li>
+<li><a href="#%E5%BC%80%E5%A7%8B">开始</a>
+<ul>
+<li><a href="#%E4%B8%80-%E9%95%9C%E5%83%8F%E7%83%A7%E5%BD%95">一、镜像烧录</a></li>
+<li><a href="#%E4%BA%8C-%E9%85%8D%E7%BD%AE%E5%9B%BD%E5%86%85%E6%BA%90">二、配置国内源</a></li>
+<li><a href="#%E4%B8%89-%E9%85%8D%E7%BD%AEfrp">三、配置Frp</a>
+<ul>
+<li><a href="#1-%E9%85%8D%E7%BD%AE%E6%9C%8D%E5%8A%A1%E7%AB%AF">1. 配置服务端</a></li>
+<li><a href="#2-%E9%85%8D%E7%BD%AE%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%A0%91%E8%8E%93%E6%B4%BE">2. 配置客户端（树莓派）</a></li>
+<li><a href="#3-%E5%90%AF%E5%8A%A8frp">3. 启动Frp</a></li>
+</ul>
+</li>
+<li><a href="#%E5%9B%9B-%E8%AE%BE%E7%BD%AEfrp%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF">四、设置Frp开机自启</a>
+<ul>
+<li><a href="#1systemctl">1.Systemctl</a></li>
+<li><a href="#2supervisor">2.Supervisor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://only-silence.github.io/post/css-xie-zhi-fu-cheng-gong-xiao-guo/">
+              <h3 class="post-title">
+                css写支付成功效果
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '61ea8234f634ee0c2b9f',
+    clientSecret: 'ecbc531fba8a6cd2b11cfc714540fc7e7ca03246',
+    repo: 'only-silence.github.io',
+    owner: 'Only-silence',
+    admin: ['Only-silence'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  
+  <a class="rss" href="https://only-silence.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
